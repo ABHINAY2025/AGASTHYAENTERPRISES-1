@@ -151,7 +151,7 @@ const InvoiceForm: React.FC = () => {
       });
   
       // Log the invoice ID and data
-      console.log("Invoice stored with custom ID: ", invoiceId);
+      // console.log("Invoice stored with custom ID: ", invoiceId);
   
       // Update the invoiceData state to reflect the custom invoiceId
       setInvoiceData({

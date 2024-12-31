@@ -18,9 +18,9 @@ const App: React.FC<AppProps> = ({ invoiceData }) => {
   const renderPage = (pageNumber: number) => {
     const shouldShowFooter = shouldShowFooterOnPage(invoiceData.items.length, pageNumber);
   
-    if (shouldShowFooter) {
-      console.log(`Footer is present on page: ${pageNumber}`);
-    }
+    // if (shouldShowFooter) {
+    //   console.log(`Footer is present on page: ${pageNumber}`);
+    // }
   
     return (
       <div className="relative min-h-[297mm] w-[210mm] mx-auto bg-white p-8 shadow-lg flex flex-col justify-between" key={pageNumber}>
