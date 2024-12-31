@@ -1,39 +1,43 @@
-import React from 'react';
-import { InvoiceData } from '../types/invoice';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import { InvoiceHeader } from './InvoiceHeader';
-import { InvoiceTable } from './InvoiceTable';
-import { InvoiceFooter } from './InvoiceFooter';
-import { calculateTotalPages, getItemsForPage, shouldShowFooterOnPage, ITEMS_PER_PAGE_1, FOOTER_THRESHOLD_2 } from '../utils/pagination';
-import WaterMark from "./Picsart_24-12-25_16-34-54-625.png"
+import React from "react";
+import { useLocation } from "react-router-dom";
+import { InvoiceData } from "../types/invoice"; // Adjust the path if necessary
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import {InvoiceHeader} from "./InvoiceHeader";
+import {InvoiceTable}from "./InvoiceTable";
+import {InvoiceFooter} from "./InvoiceFooter";
+import WaterMark from "./Picsart_24-12-25_16-34-54-625.png";
+import {
+  calculateTotalPages,
+  getItemsForPage,
+  shouldShowFooterOnPage,
+  ITEMS_PER_PAGE_1,
+  FOOTER_THRESHOLD_2,
+} from "../utils/pagination";
 
-interface AppProps {
-  invoiceData: InvoiceData;  // Accept invoiceData as prop
-}
+const InvoicePage: React.FC = () => {
+  const location = useLocation();
+  const invoiceData: InvoiceData = location.state?.invoice;
 
-const App: React.FC<AppProps> = ({ invoiceData }) => {
+  if (!invoiceData) {
+    return <div>No invoice data provided</div>;
+  }
+
   const totalPages = calculateTotalPages(invoiceData.items.length);
 
   const renderPage = (pageNumber: number) => {
     const shouldShowFooter = shouldShowFooterOnPage(invoiceData.items.length, pageNumber);
-  
-    if (shouldShowFooter) {
-      console.log(`Footer is present on page: ${pageNumber}`);
-    }
-  
+
     return (
-      <div className="relative min-h-[297mm] w-[210mm] mx-auto bg-white p-8 shadow-lg flex flex-col justify-between" key={pageNumber}>
-        {/* Watermark Background */}
+      <div
+        className="relative min-h-[297mm] w-[210mm] mx-auto bg-white p-8 shadow-lg flex flex-col justify-between"
+        key={pageNumber}
+        id={`page-${pageNumber}`}
+      >
         <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-          <img
-            src={WaterMark}
-            alt="Watermark"
-            style={{ width: '500px' }}
-          />
+          <img src={WaterMark} alt="Watermark" style={{ width: "500px" }} />
         </div>
-  
-        {/* Page Content */}
+
         <div className="relative z-10">
           <InvoiceHeader data={invoiceData} />
           {pageNumber === 1 && (
@@ -47,7 +51,7 @@ const App: React.FC<AppProps> = ({ invoiceData }) => {
               </div>
             </div>
           )}
-  
+
           <InvoiceTable
             items={getItemsForPage(invoiceData.items, pageNumber)}
             startIndex={
@@ -59,11 +63,11 @@ const App: React.FC<AppProps> = ({ invoiceData }) => {
             }
             showHeader={pageNumber === 1}
           />
-  
+
           {shouldShowFooter && <InvoiceFooter data={invoiceData} />}
         </div>
-  
-        {/* Terms and Signature Section - Only for Page 2 */}
+
+        {shouldShowFooter && (
           <div>
             <div className="flex justify-between">
               <div className="w-[65%]">
@@ -89,43 +93,35 @@ const App: React.FC<AppProps> = ({ invoiceData }) => {
               <h1>Authorized Signature</h1>
             </div>
           </div>
-  
-        {/* Page Number */}
-        <div className="absolute w-full justify-center  flex-col left-0 bottom-0 flex">
-          <div className=' flex justify-center w-full  '>
-            <h1>{pageNumber}</h1></div>
-          <div className='flex'>
+        )}
+
+        <div className="absolute w-full left-0 bottom-0 flex">
           <div className="w-[50%] h-2 bg-red-500"></div>
           <div className="w-[50%] h-2 bg-blue-700"></div>
-          </div>
         </div>
       </div>
     );
   };
-  
-  
-  
-  
 
   const downloadPDF = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event.preventDefault();  // Prevent page reload
+    event.preventDefault();
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdf = new jsPDF("p", "mm", "a4");
     for (let i = 0; i < totalPages; i++) {
       const pageContainer = document.querySelector(`#page-${i + 1}`);
       if (!pageContainer) continue;
 
       const canvas = await html2canvas(pageContainer as HTMLElement, {
         scale: 2,
-        useCORS: true, // Enables cross-origin image capture
+        useCORS: true,
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdfWidth = 210; // A4 width in mm
+      const imgData = canvas.toDataURL("image/png");
+      const pdfWidth = 210;
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
       if (i > 0) pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
     }
     pdf.save(`invoice-${invoiceData.invoiceDetails.invoiceNumber}.pdf`);
   };
@@ -133,15 +129,11 @@ const App: React.FC<AppProps> = ({ invoiceData }) => {
   return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-[210mm] mx-auto space-y-8">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <div id={`page-${i + 1}`} key={i}>
-            {renderPage(i + 1)}
-          </div>
-        ))}
+        {Array.from({ length: totalPages }, (_, i) => renderPage(i + 1))}
       </div>
       <div className="text-center mt-8">
         <button
-          onClick={downloadPDF}  // Ensure onClick calls downloadPDF
+          onClick={downloadPDF}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Download All Pages
@@ -151,4 +143,4 @@ const App: React.FC<AppProps> = ({ invoiceData }) => {
   );
 };
 
-export default App;
+export default InvoicePage;

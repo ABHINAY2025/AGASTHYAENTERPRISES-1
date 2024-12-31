@@ -1,7 +1,7 @@
-export const ITEMS_PER_PAGE_1 = 23;
-export const ITEMS_PER_PAGE_2 = 23;
+export const ITEMS_PER_PAGE_1 = 19;
+export const ITEMS_PER_PAGE_2 = 24;
 export const FOOTER_THRESHOLD_1 = 11;
-export const FOOTER_THRESHOLD_2 = 40;
+export const FOOTER_THRESHOLD_2 = 37;
 
 export const calculateTotalPages = (totalItems: number): number => {
   if (totalItems > FOOTER_THRESHOLD_2) {

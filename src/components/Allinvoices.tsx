@@ -3,6 +3,8 @@ import { db } from '../components/firebase'; // Import your Firebase config
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore'; // Import necessary Firestore methods
 import type { InvoiceData } from '../types/invoice';
 import { useNavigate } from 'react-router-dom';
+import Privew from "./Privew"
+
 
 // Accordion component for each invoice
 const InvoiceAccordion: React.FC<{
@@ -11,7 +13,13 @@ const InvoiceAccordion: React.FC<{
   handleDelete: (invoiceId: string) => void;
 }> = ({ invoice, index, handleDelete }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
+  const handleGeneratePDF = () => {
+    // Navigate to the home page ("/") and pass invoice data in the state
+    navigate('/i', { state: { invoice } });
+  };
+  
   return (
     <div className="border-2 mx-20  border-gray-300 rounded-md shadow-sm bg-white">
       <button
@@ -91,6 +99,12 @@ const InvoiceAccordion: React.FC<{
             className="cursor-pointer text-red-500 hover:text-red-700"
           >
             Delete Invoice
+          </h4>
+          <h4
+            onClick={handleGeneratePDF}
+            className="cursor-pointer text-blue-500 hover:text-blue-700"
+          >
+            Generate PDF
           </h4>
         </div>
       )}

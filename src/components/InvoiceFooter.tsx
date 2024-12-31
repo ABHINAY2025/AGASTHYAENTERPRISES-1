@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const InvoiceFooter: React.FC<Props> = ({ data }) => (
-  <footer className="">
+  <footer className="mt-12">
     <div className=" ">
       <div className='flex items-center justify-between border-b-2 pb-2  border-black'>
         <div>
@@ -41,7 +41,7 @@ export const InvoiceFooter: React.FC<Props> = ({ data }) => (
             <div>
               <h1>Subtotal:</h1>
               <h1>CGST:({data.cgst})%</h1>
-              <h1>SGST :({data.sgst})%</h1>
+              <h1>SGST:({data.sgst})%</h1>
               <h1 className='mt-4 font-bold'>Total:</h1>
             </div>
             <div className=' text-right'>
