@@ -269,7 +269,7 @@ const InvoiceForm: React.FC = () => {
               />
               <input
                 type="number"
-                placeholder="Rate"
+                placeholder="Price"
                 className="p-3 border border-gray-300 rounded-lg w-full"
                 value={item.rate}
                 onChange={(e) => handleItemChange(index, 'rate', e.target.value)}

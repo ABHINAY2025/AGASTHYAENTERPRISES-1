@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { InvoiceData } from "../types/invoice"; // Adjust the path if necessary
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -132,6 +132,9 @@ const InvoicePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
+       <div className=" px-7 py-2 bg-blue-500 w-20 rounded-lg ml-10 hover:bg-blue-800 justify-center flex">
+        <Link to={"/"} className=" text-white">Back</Link>
+      </div>
       <div className="max-w-[210mm] mx-auto space-y-8">
         {Array.from({ length: totalPages }, (_, i) => renderPage(i + 1))}
       </div>
@@ -142,6 +145,7 @@ const InvoicePage: React.FC = () => {
         >
           Download All Pages
         </button>
+     
       </div>
     </div>
   );
