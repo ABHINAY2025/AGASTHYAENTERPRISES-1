@@ -2,8 +2,16 @@ import React, { useState } from 'react';
 import { InvoiceData, InvoiceItem, BillTo, InvoiceDetails } from '../../types/invoice'; // Import the InvoiceData interface
 import { FaTrashAlt } from 'react-icons/fa'; // Import the trash icon from React Icons
 import Preview from '../Privew'; // Assuming Preview component is in the right folder
+import { getFirestore, collection, addDoc, doc, getDoc , setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const InvoiceForm: React.FC = () => {
+  const navigate = useNavigate(); // Get the navigate function
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     items: [],
     billTo: {
@@ -25,7 +33,9 @@ const InvoiceForm: React.FC = () => {
     sgstAmount: 0,
     AmountINwords: '',
   });
-
+  const handleNavigate = () => {
+    navigate('/allinvoices'); // Navigate to the /allinvoices route
+  };
   const handleItemChange = (index: number, field: keyof InvoiceItem, value: string) => {
     const updatedItems = [...invoiceData.items];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
@@ -108,10 +118,73 @@ const InvoiceForm: React.FC = () => {
     setInvoiceData({ ...invoiceData, total: roundedTotal });
   };
 
+  const storeInvoiceData = async () => {
+    try {
+      // Custom invoice ID
+      const invoiceId = `${invoiceData.invoiceDetails.invoiceNumber}`;
+  
+      // Reference to the Firestore document with the custom ID
+      const docRef = doc(db, 'invoices', invoiceId);
+  
+      // Check if a document with the same invoice ID already exists
+      const docSnap = await getDoc(docRef);
+  
+      if (docSnap.exists()) {
+        // If the document exists, show an error message and exit
+        toast.error(`Invoice with ID: ${invoiceId} already exists.`);
+        return;
+      }
+  
+      // Save the invoice data to Firestore
+      await setDoc(docRef, {
+        invoiceId, // Save the custom invoiceId
+        items: invoiceData.items,
+        billTo: invoiceData.billTo,
+        invoiceDetails: invoiceData.invoiceDetails,
+        cgst: invoiceData.cgst,
+        sgst: invoiceData.sgst,
+        subtotal: invoiceData.subtotal,
+        total: invoiceData.total,
+        cgstAmount: invoiceData.cgstAmount,
+        sgstAmount: invoiceData.sgstAmount,
+        AmountINwords: invoiceData.AmountINwords,
+      });
+  
+      // Log the invoice ID and data
+      console.log("Invoice stored with custom ID: ", invoiceId);
+  
+      // Update the invoiceData state to reflect the custom invoiceId
+      setInvoiceData({
+        ...invoiceData,
+        invoiceDetails: {
+          ...invoiceData.invoiceDetails,
+          invoiceNumber: invoiceId, // Assuming 'invoiceNumber' stores the ID in the invoice details
+        },
+      });
+  
+      // Show success message
+      toast.success(`Invoice saved successfully with ID: ${invoiceId}`);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+  
+      // Show error message
+      toast.error("Error saving invoice. Please try again.");
+    }
+  };
+  
+  
+  
+  
   return (
-    <div className="max-w-5xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+    <div className="max-w-5xl mx-auto p-4 bg-white shadow-lg rounded-lg">
+      <div 
+      className='font-bold w-40 rounded py-2 px-7 justify-center items-center flex hover:bg-blue-800 cursor-pointer bg-blue-500 text-white'
+      onClick={handleNavigate} // Handle the click event
+    >
+      <p>All Invoices</p>
+    </div>
       <h1 className="text-2xl font-semibold text-center mb-8">Invoice Form</h1>
-
+      <ToastContainer /> {/* This will render the toasts */}
       <form>
         {/* Bill To Section */}
         <div className="mb-6">
@@ -257,7 +330,7 @@ const InvoiceForm: React.FC = () => {
         </div>
 
         {/* Total Calculation and Final Section */}
-        <div className="mb-6">
+        <div className="mb-6 ">
           <button
             type="button"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg mr-4"
@@ -267,13 +340,18 @@ const InvoiceForm: React.FC = () => {
           </button>
           <button
             type="button"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            className="px-4 py-2 ml-4 bg-blue-600 text-white rounded-lg"
             onClick={handleRoundOff}
           >
             Round Off
           </button>
+            <button
+             type="button"
+             className="px-4 ml-10 py-2 bg-blue-600 text-white rounded-lg"
+             onClick={storeInvoiceData}>
+              save data
+            </button>
         </div>
-
         <Preview invoiceData={invoiceData} />
       </form>
     </div>
