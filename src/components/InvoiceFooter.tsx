@@ -12,7 +12,7 @@ export const InvoiceFooter: React.FC<Props> = ({ data }) => (
         <div>
           <div className='mb-2 w-96'>
             <h1 className='font-bold'>Amount In Words:</h1>
-            <h1 className=' underline font-bold '>{numberToWords(data.total,2)}</h1>
+            <h1 className=' underline font-bold '>{numberToWords(data.total,2).toUpperCase()} RUPEES ONLY</h1>
           </div>
           <div>
             <h1 className=' underline underline-offset-2 font-bold'>ACCOUNT DETAILS:</h1>
