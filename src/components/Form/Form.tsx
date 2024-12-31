@@ -238,13 +238,6 @@ const InvoiceForm: React.FC = () => {
               value={invoiceData.invoiceDetails.date}
               onChange={(e) => handleInvoiceDetailsChange('date', e.target.value)}
             />
-            <input
-              type="text"
-              placeholder="Despatch Through"
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.invoiceDetails.DespThrough}
-              onChange={(e) => handleInvoiceDetailsChange('DespThrough', e.target.value)}
-            />
           </div>
         </div>
 

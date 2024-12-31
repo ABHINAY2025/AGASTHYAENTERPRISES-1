@@ -16,7 +16,7 @@ export const InvoiceTable: React.FC<Props> = ({ items, startIndex, showHeader = 
           <th className="border p-1">Description</th>
           <th className="border p-1">HSN Code</th>
           <th className="border p-1">Quantity</th>
-          <th className="border p-1">Rate</th>
+          <th className="border p-1">Price</th>
           <th className="border p-1">Amount</th>
         </tr>
       </thead>

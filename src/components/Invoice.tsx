@@ -95,9 +95,13 @@ const InvoicePage: React.FC = () => {
           </div>
         )}
 
-        <div className="absolute w-full left-0 bottom-0 flex">
+       <div className="absolute w-full justify-center  flex-col left-0 bottom-0 flex">
+          <div className=' flex justify-center w-full  '>
+            <h1>{pageNumber}</h1></div>
+          <div className='flex'>
           <div className="w-[50%] h-2 bg-red-500"></div>
           <div className="w-[50%] h-2 bg-blue-700"></div>
+          </div>
         </div>
       </div>
     );

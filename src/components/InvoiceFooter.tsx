@@ -7,7 +7,7 @@ interface Props {
 
 export const InvoiceFooter: React.FC<Props> = ({ data }) => (
   <footer className="mt-12">
-    <div className=" ">
+    <div className="">
       <div className='flex items-center justify-between border-b-2 pb-2  border-black'>
         <div>
           <div className='mb-2 w-96'>
