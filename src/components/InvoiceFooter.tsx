@@ -1,9 +1,29 @@
 import React from 'react';
 import { InvoiceData } from '../types/invoice';
-import { numberToWords } from "amount-to-words";
+import { ToWords } from 'to-words';
 interface Props {
   data: InvoiceData;
 }
+const toWords = new ToWords({
+  localeCode: 'en-IN',
+  converterOptions: {
+    currency: true,
+    ignoreDecimal: false,
+    ignoreZeroCurrency: false,
+    doNotAddOnly: false,
+    currencyOptions: {
+      // can be used to override defaults for the selected locale
+      name: 'Rupee',
+      plural: 'Rupees',
+      symbol: '₹',
+      fractionalUnit: {
+        name: 'Paisa',
+        plural: 'Paise',
+        symbol: '',
+      },
+    },
+  },
+});
 
 export const InvoiceFooter: React.FC<Props> = ({ data }) => (
   <footer className="mt-12">
@@ -12,7 +32,7 @@ export const InvoiceFooter: React.FC<Props> = ({ data }) => (
         <div>
           <div className='mb-2 w-96'>
             <h1 className='font-bold'>Amount In Words:</h1>
-            <h1 className=' underline font-bold '>{numberToWords(data.total,2).toUpperCase()} RUPEES ONLY</h1>
+            <h1 className=' underline font-bold '>{toWords.convert(data.total).toUpperCase()}</h1>
           </div>
           <div>
             <h1 className=' underline underline-offset-2 font-bold'>ACCOUNT DETAILS:</h1>
