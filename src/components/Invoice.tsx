@@ -41,13 +41,15 @@ const InvoicePage: React.FC = () => {
         <div className="relative z-10">
           <InvoiceHeader data={invoiceData} />
           {pageNumber === 1 && (
-            <div className="grid grid-cols-2 gap-8 mb-3">
+            <div className="grid w-[60%]   gap-8 mb-3">
               <div>
-                <h2 className="font-semibold mb-2">Bill To:</h2>
-                <p>Name: {invoiceData.billTo.name}</p>
-                <p>Address: {invoiceData.billTo.address}</p>
-                <p>Mobile: {invoiceData.billTo.mobileNo}</p>
-                <p>GSTIN: {invoiceData.billTo.gstin}</p>
+                <h2 className="font-bold mb-2 ">Bill To:</h2>
+                <div className="  w-full">
+                <p>Name: <span className=" font-bold">{invoiceData.billTo.name}</span> </p>
+                <p>Address: <span className=" font-bold">{invoiceData.billTo.address}</span> </p>
+                <p>Mobile: <span className=" font-bold">{invoiceData.billTo.mobileNo}</span> </p>
+                <p>GSTIN: <span className=" font-bold">{invoiceData.billTo.gstin}</span> </p>
+                </div>
               </div>
             </div>
           )}
