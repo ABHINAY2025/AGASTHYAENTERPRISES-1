@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../components/firebase'; // Import your Firebase config
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore'; // Import necessary Firestore methods
 import type { InvoiceData } from '../types/invoice';
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
+
 
 
 // Accordion component for each invoice
@@ -87,8 +88,7 @@ const InvoiceAccordion: React.FC<{
             <h4 className="font-semibold text-lg text-gray-800">Total</h4>
             <div>
               <strong>Total Amount:</strong>{' '}
-              {invoice.items.reduce((total, item) => total + item.quantity * item.rate, 0) *
-                (1 + (invoice.sgst + invoice.cgst) / 100)}
+              <p>₹{invoice.total}</p>
             </div>
           </div>
 

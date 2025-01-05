@@ -83,7 +83,7 @@ const App: React.FC<AppProps> = ({ invoiceData }) => {
                 <h1>
                   For <span className="font-bold  text-customRed  text-lg">AGASTHYA <span className=' text-blue-900'>ENTERPRISES</span></span>
                 </h1>
-                <img className=' w-36 mt-3  ml-10' src={stamp} alt="" />
+                <img className=' w-36 mt-3  ml-24' src={stamp} alt="" />
               </div>
             </div>
             <div className=" flex text-xl text-black justify-between">

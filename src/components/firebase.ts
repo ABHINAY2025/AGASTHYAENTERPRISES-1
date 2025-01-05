@@ -2,6 +2,7 @@
 
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
 
 // Your Firebase configuration object
 const firebaseConfig = {
@@ -14,7 +15,14 @@ const firebaseConfig = {
     measurementId: "G-2RHC16R8NN"
 };
 
+// Initialize Firebase app
 const app = initializeApp(firebaseConfig);
+
+// Firestore
 const db = getFirestore(app);
 
-export { db, addDoc, collection };
+// Authentication
+const auth = getAuth(app);
+
+// Export Firestore and Authentication utilities
+export { db, addDoc, collection, auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut };

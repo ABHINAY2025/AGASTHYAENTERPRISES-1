@@ -1,17 +1,31 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Import BrowserRouter, Routes, and Route
-import InvoiceForm from './components/Form/Form'; // Your InvoiceForm component
-import AllInvoices from './components/Allinvoices'; // Import the AllInvoices page/component // Ensure the correct path to Preview component
-import Invoice from "./components/Invoice"
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './components/firebase'; // Import the configured auth object
+import InvoiceForm from './components/Form/Form';
+import AllInvoices from './components/Allinvoices';
+import Invoice from './components/Invoice';
+import Login from './components/Login';
 
 const App: React.FC = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <Router>
       <Routes>
-        {/* Define your routes here */}
-        <Route path="/" element={<InvoiceForm />} /> {/* Home route renders InvoiceForm */}
-        <Route path="/allinvoices" element={<AllInvoices />} /> 
-        <Route path="/generate-invoice" element={<Invoice />} /> 
+        <Route path="/" element={user ? <InvoiceForm /> : <Navigate to="/login" />} />
+        <Route path="/allinvoices" element={user ? <AllInvoices /> : <Navigate to="/login" />} />
+        <Route path="/generate-invoice" element={user ? <Invoice /> : <Navigate to="/login" />} />
+        {/* Add a Login component route */}
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );
