@@ -20,7 +20,7 @@ const InvoiceForm: React.FC = () => {
     });
     return () => unsubscribe(); // Cleanup on unmount
   }, []);
-console.log(User)
+// console.log(User)
   const navigate = useNavigate(); // Get the navigate function
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     items: [],
