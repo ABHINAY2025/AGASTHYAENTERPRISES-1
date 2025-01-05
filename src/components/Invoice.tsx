@@ -86,14 +86,14 @@ const InvoicePage: React.FC = () => {
                 </p>
               </div>
               <div>
-                <h1>
-                  For <span className="font-bold text-blue-900 text-lg">AGASTHYA ENTERPRISES</span>
+              <h1>
+                  For <span className="font-bold  text-customRed  text-lg">AGASTHYA <span className=' text-blue-900'>ENTERPRISES</span></span>
                 </h1>
                 <img className=' w-36 mt-3  ml-10' src={stamp} alt="" />
               </div>
             </div>
             <div className=" flex text-xl text-black justify-between">
-              <h1>Receiver Signature</h1>
+              <h1 className=" mt-5">Receiver Signature</h1>
               <div className=" ">
               <div className=" w-full flex justify-end  text-[10px] ">
                  <p>
