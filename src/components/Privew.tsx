@@ -7,6 +7,7 @@ import { InvoiceTable } from './InvoiceTable';
 import { InvoiceFooter } from './InvoiceFooter';
 import { calculateTotalPages, getItemsForPage, shouldShowFooterOnPage, ITEMS_PER_PAGE_1, FOOTER_THRESHOLD_2 } from '../utils/pagination';
 import WaterMark from "./Picsart_24-12-25_16-34-54-625.png"
+import stamp from "./Form/image.png"
 
 interface AppProps {
   invoiceData: InvoiceData;  // Accept invoiceData as prop
@@ -80,19 +81,26 @@ const App: React.FC<AppProps> = ({ invoiceData }) => {
               </div>
               <div>
                 <h1>
-                  For <span className="font-bold text-blue-900 text-lg">AGASTHYA ENTERPRISES</span>
+                  For <span className="font-bold  text-blue-900 text-lg">AGASTHYA ENTERPRISES</span>
                 </h1>
+                <img className=' w-36 mt-3  ml-10' src={stamp} alt="" />
               </div>
             </div>
-            <div className="mt-10 flex text-xl text-black justify-between">
+            <div className=" flex text-xl text-black justify-between">
               <h1>Receiver Signature</h1>
-              <h1>Authorized Signature</h1>
+              <div className=" ">
+              <div className=" w-full flex justify-end  text-[10px] ">
+                 <p>
+                 This is a digitaly signed document
+                  </p></div>
+              <h1 className="-mt-3">Authorized Signature</h1>
+              </div>
             </div>
           </div>
   
         {/* Page Number */}
         <div className="absolute w-full justify-center  flex-col left-0 bottom-0 flex">
-          <div className=' flex justify-center w-full pb-2  '>
+        <div className='flex justify-center px-6 w-full'>
             <h1>{pageNumber}</h1></div>
           <div className='flex'>
           <div className="w-[50%] h-2 bg-red-500"></div>

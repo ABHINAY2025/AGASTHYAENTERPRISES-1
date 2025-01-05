@@ -7,6 +7,7 @@ import {InvoiceHeader} from "./InvoiceHeader";
 import {InvoiceTable}from "./InvoiceTable";
 import {InvoiceFooter} from "./InvoiceFooter";
 import WaterMark from "./Picsart_24-12-25_16-34-54-625.png";
+import stamp from "./Form/image.png"
 import {
   calculateTotalPages,
   getItemsForPage,
@@ -71,7 +72,7 @@ const InvoicePage: React.FC = () => {
 
         {shouldShowFooter && (
           <div>
-            <div className="flex justify-between">
+            <div className="flex  justify-between">
               <div className="w-[65%]">
                 <h1 className="underline underline-offset-4">Terms and Conditions:</h1>
                 <ul>
@@ -88,18 +89,26 @@ const InvoicePage: React.FC = () => {
                 <h1>
                   For <span className="font-bold text-blue-900 text-lg">AGASTHYA ENTERPRISES</span>
                 </h1>
+                <img className=' w-36 mt-3  ml-10' src={stamp} alt="" />
               </div>
             </div>
-            <div className="mt-10 flex text-xl text-black justify-between">
+            <div className=" flex text-xl text-black justify-between">
               <h1>Receiver Signature</h1>
-              <h1>Authorized Signature</h1>
+              <div className=" ">
+              <div className=" w-full flex justify-end  text-[10px] ">
+                 <p>
+                 This is a digitaly signed document
+                  </p></div>
+              <h1 className="-mt-3">Authorized Signature</h1>
+              </div>
             </div>
           </div>
         )}
 
-       <div className="absolute w-full justify-center  flex-col left-0 bottom-0 flex">
-          <div className=' flex justify-center w-full  '>
-            <h1>{pageNumber}</h1></div>
+       <div className="absolute w-full justify-center  flex-col left-0 gap-2 bottom-0 flex">
+          <div className='flex justify-center px-6 w-full'>
+            <p className="">{pageNumber}</p>
+            </div>
           <div className='flex'>
           <div className="w-[50%] h-2 bg-red-500"></div>
           <div className="w-[50%] h-2 bg-blue-700"></div>
