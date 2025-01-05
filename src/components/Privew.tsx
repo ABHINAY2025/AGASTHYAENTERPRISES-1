@@ -7,7 +7,7 @@ import { InvoiceTable } from './InvoiceTable';
 import { InvoiceFooter } from './InvoiceFooter';
 import { calculateTotalPages, getItemsForPage, shouldShowFooterOnPage, ITEMS_PER_PAGE_1, FOOTER_THRESHOLD_2 } from '../utils/pagination';
 import WaterMark from "./Picsart_24-12-25_16-34-54-625.png"
-import stamp from "./Form/imageupdated.png"
+import stamp from "./Form/image.png"
 
 interface AppProps {
   invoiceData: InvoiceData;  // Accept invoiceData as prop
