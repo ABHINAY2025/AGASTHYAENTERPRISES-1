@@ -47,9 +47,9 @@ export const InvoiceFooter: React.FC<Props> = ({ data }) => (
               </div>
               <div className='ml-10'>
                 <ul>
-                  <li className=' font-bold'>FEDERAL BANK</li>
-                  <li className=' font-bold'>16720200005119</li>
-                  <li className=' font-bold'>FDRL0001672</li>
+                  <li className=' font-bold'>INDIAN OVERSEAS BANK</li>
+                  <li className=' font-bold'>327502000000422</li>
+                  <li className=' font-bold'>IOBA0003275</li>
                   <li className=' font-bold'>LB NAGAR</li>
                 </ul>
               </div>
