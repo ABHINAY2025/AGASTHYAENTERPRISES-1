@@ -39,6 +39,7 @@ export const InvoiceFooter: React.FC<Props> = ({ data }) => {
   const cgstPercent = gstPercent / 2;
   const sgstPercent = gstPercent / 2;
 
+  
   return (
     <footer className="mt-12">
 
