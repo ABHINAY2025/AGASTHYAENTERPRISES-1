@@ -1,27 +1,82 @@
-import React, { useState,useEffect } from 'react';
-import { InvoiceData, InvoiceItem, BillTo, InvoiceDetails } from '../../types/invoice'; // Import the InvoiceData interface
-import { FaTrashAlt } from 'react-icons/fa'; // Import the trash icon from React Icons
-import Preview from '../Privew'; // Assuming Preview component is in the right folder
-import { getFirestore, collection, addDoc, doc, getDoc , setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
-import { ToastContainer } from 'react-toastify';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect, useState } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
+import Preview from '../Privew';
+import Loader from '../Loader';
 import Navbar from '../Navbar';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from "../firebase"
+import { useNavigate } from 'react-router-dom';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+/* ================== TYPES ================== */
+
+export interface InvoiceItem {
+  description: string;
+  hsnCode: string;
+  quantity: string;
+  rate: string;
+  gstPercent: string;
+  amount: string;
+  gstAmount?: number;
+}
+
+export interface BillTo {
+  name: string;
+  address: string;
+  gstin: string;
+  mobileNo: string;
+}
+
+export interface InvoiceDetails {
+  invoiceNumber: string;
+  date: string;
+}
+
+export interface InvoiceData {
+  items: InvoiceItem[];
+  billTo: BillTo;
+  invoiceDetails: InvoiceDetails;
+  subtotal: number;
+  total: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  AmountINwords: string;
+}
+
+/* ================== STYLES ================== */
+
+const inputStyle =
+  "w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 " +
+  "focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-500 transition";
+
+const labelStyle = "block text-sm font-semibold text-gray-700 mb-1";
+
+const btn =
+  "bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-5 py-2 rounded-md shadow-md transition font-semibold";
+
+const btnDark =
+  "bg-gray-700 hover:bg-gray-800 active:scale-95 text-white px-4 py-2 rounded-md shadow transition font-semibold";
+
+const sectionTitle =
+  "text-lg font-bold text-gray-800 border-b pb-1 mb-3";
+
+/* ================== COMPONENT ================== */
+
+
 
 const InvoiceForm: React.FC = () => {
-  const [User,setUser]=useState(null)
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (Cuser) => {
-      setUser(Cuser);
-    });
-    return () => unsubscribe(); // Cleanup on unmount
+    onAuthStateChanged(auth, () => {});
   }, []);
-// console.log(User)
-  const navigate = useNavigate(); // Get the navigate function
+
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     items: [],
     billTo: {
@@ -33,65 +88,41 @@ const InvoiceForm: React.FC = () => {
     invoiceDetails: {
       invoiceNumber: '',
       date: '',
-      DespThrough: '',
     },
-    cgst: '',
-    sgst: '',
     subtotal: 0,
     total: 0,
     cgstAmount: 0,
     sgstAmount: 0,
     AmountINwords: '',
   });
-  const handleNavigate = () => {
-    navigate('/allinvoices'); // Navigate to the /allinvoices route
-  };
-  const handleItemChange = (index: number, field: keyof InvoiceItem, value: string) => {
-    const updatedItems = [...invoiceData.items];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
 
-    if (field === 'rate' || field === 'quantity') {
-      const rate = parseFloat(updatedItems[index].rate) || 0;
-      const quantity = parseFloat(updatedItems[index].quantity) || 0;
-      updatedItems[index].amount = (rate * quantity).toFixed(2);
-    }
+  /* ================== HANDLERS ================== */
 
-    setInvoiceData({ ...invoiceData, items: updatedItems });
-  };
-
-  const handleDeleteItem = (index: number) => {
-    const updatedItems = invoiceData.items.filter((_, i) => i !== index);
-    setInvoiceData({ ...invoiceData, items: updatedItems });
-  };
-
-  const handleBillToChange = (field: keyof BillTo, value: string) => {
+  const handleBillToChange = (field: keyof BillTo, val: string) => {
     setInvoiceData({
       ...invoiceData,
-      billTo: { ...invoiceData.billTo, [field]: value },
+      billTo: { ...invoiceData.billTo, [field]: val },
     });
   };
 
-  const handleInvoiceDetailsChange = (field: keyof InvoiceDetails, value: string) => {
-    let updatedValue = value;
-
-    if (field === 'date' && value) {
-      const date = new Date(value);
-      updatedValue = date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }).toUpperCase();
+  const handleInvoiceDetailsChange = (field: keyof InvoiceDetails, val: string) => {
+    let updated = val;
+    if (field === 'date') {
+      updated = new Date(val)
+        .toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        })
+        .toUpperCase();
     }
 
     setInvoiceData({
       ...invoiceData,
-      invoiceDetails: { ...invoiceData.invoiceDetails, [field]: updatedValue },
+      invoiceDetails: { ...invoiceData.invoiceDetails, [field]: updated },
     });
   };
 
-  const handleCGSTSGSTChange = (field: 'cgst' | 'sgst', value: string) => {
-    setInvoiceData({ ...invoiceData, [field]: value });
-  };
 
   const handleAddItem = () => {
     setInvoiceData({
@@ -103,261 +134,316 @@ const InvoiceForm: React.FC = () => {
           hsnCode: '',
           quantity: '',
           rate: '',
-          amount: '0',
+          gstPercent: '',
+          amount: '0.00',
+          gstAmount: 0,
         },
       ],
     });
   };
 
+
+  const handleItemChange = (
+    i: number,
+    field: keyof InvoiceItem,
+    val: string
+  ) => {
+
+    const items = [...invoiceData.items];
+    items[i] = { ...items[i], [field]: val };
+
+    const rate = parseFloat(items[i].rate) || 0;
+    const qty = parseFloat(items[i].quantity) || 0;
+    const gst = parseFloat(items[i].gstPercent) || 0;
+
+    const baseAmount = rate * qty;
+    const gstAmount = (baseAmount * gst) / 100;
+    const finalAmount = baseAmount + gstAmount;
+
+    items[i].gstAmount = gstAmount;
+    items[i].amount = finalAmount.toFixed(2);
+
+    setInvoiceData({
+      ...invoiceData,
+      items
+    });
+  };
+
+
+  const handleDeleteItem = (i: number) => {
+    setInvoiceData({
+      ...invoiceData,
+      items: invoiceData.items.filter((_, idx) => idx !== i),
+    });
+  };
+
+
+  /* ================== TOTALS ================== */
+
   const handleCalculateTotal = () => {
-    const subtotal = invoiceData.items.reduce((acc, item) => acc + (parseFloat(item.amount) || 0), 0);
-    const cgstAmount = (subtotal * (parseFloat(invoiceData.cgst) || 0)) / 100;
-    const sgstAmount = (subtotal * (parseFloat(invoiceData.sgst) || 0)) / 100;
-    const total = subtotal + cgstAmount + sgstAmount;
+
+    let subtotal = 0;
+    let gstTotal = 0;
+
+    invoiceData.items.forEach(i => {
+      const base = (parseFloat(i.rate || "0") * parseFloat(i.quantity || "0")) || 0;
+      subtotal += base;
+      gstTotal += i.gstAmount || 0;
+    });
+
     setInvoiceData({
       ...invoiceData,
       subtotal,
-      cgstAmount,
-      sgstAmount,
-      total,
+      cgstAmount: gstTotal / 2,
+      sgstAmount: gstTotal / 2,
+      total: subtotal + gstTotal
     });
   };
 
   const handleRoundOff = () => {
-    const roundedTotal = Math.round(invoiceData.total);
-    setInvoiceData({ ...invoiceData, total: roundedTotal });
+    setInvoiceData({
+      ...invoiceData,
+      total: Math.round(invoiceData.total),
+    });
   };
+
+
+  /* ================== SAVE ================== */
 
   const storeInvoiceData = async () => {
-    try {
-      // Custom invoice ID
-      const invoiceId = `${invoiceData.invoiceDetails.invoiceNumber}`;
-  
-      // Reference to the Firestore document with the custom ID
-      const docRef = doc(db, 'invoices', invoiceId);
-  
-      // Check if a document with the same invoice ID already exists
-      const docSnap = await getDoc(docRef);
-  
-      if (docSnap.exists()) {
-        // If the document exists, show an error message and exit
-        toast.error(`Invoice with ID: ${invoiceId} already exists.`);
-        return;
-      }
-  
-      // Save the invoice data to Firestore
-      await setDoc(docRef, {
-        invoiceId, // Save the custom invoiceId
-        items: invoiceData.items,
-        billTo: invoiceData.billTo,
-        invoiceDetails: invoiceData.invoiceDetails,
-        cgst: invoiceData.cgst,
-        sgst: invoiceData.sgst,
-        subtotal: invoiceData.subtotal,
-        total: invoiceData.total,
-        cgstAmount: invoiceData.cgstAmount,
-        sgstAmount: invoiceData.sgstAmount,
-        AmountINwords: invoiceData.AmountINwords,
-      });
-  
-      // Log the invoice ID and data
-      // console.log("Invoice stored with custom ID: ", invoiceId);
-  
-      // Update the invoiceData state to reflect the custom invoiceId
-      setInvoiceData({
-        ...invoiceData,
-        invoiceDetails: {
-          ...invoiceData.invoiceDetails,
-          invoiceNumber: invoiceId, // Assuming 'invoiceNumber' stores the ID in the invoice details
-        },
-      });
-  
-      // Show success message
-      toast.success(`Invoice saved successfully with ID: ${invoiceId}`);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-  
-      // Show error message
-      toast.error("Error saving invoice. Please try again.");
+  try {
+    const invoiceNo = invoiceData.invoiceDetails.invoiceNumber;
+
+    if (!invoiceNo) {
+      toast.error("Invoice number required");
+      return;
     }
-  };
-  
-  
-  
-  
+
+    setLoading(true);    // ✅ SHOW LOADER
+
+    const ref = doc(db, 'invoices', invoiceNo);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      toast.error("Invoice already exists");
+      setLoading(false);
+      return;
+    }
+
+    await setDoc(ref, {
+      invoiceId: invoiceNo,
+      ...invoiceData,
+    });
+
+    toast.success("Invoice Saved ✅");
+
+  } catch (err) {
+    toast.error("Save failed");
+  }
+  finally {
+    setLoading(false);  // ✅ HIDE LOADER
+  }
+};
+
+
+  /* ================== JSX ================== */
+
   return (
-    <div className="max-w-5xl mx-auto p-4 bg-white shadow-lg rounded-lg">
-      <Navbar/>
-      <div 
-      className='font-bold w-40 rounded py-2 px-7 justify-center items-center flex hover:bg-blue-800 cursor-pointer bg-blue-500 text-white'
-      onClick={handleNavigate} // Handle the click event
-    >
-      <p>All Invoices</p>
-    </div>
-      <h1 className="text-2xl font-semibold text-center mb-8">Invoice Form</h1>
-      <ToastContainer /> {/* This will render the toasts */}
-      <form>
-        {/* Bill To Section */}
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold mb-4">Bill To</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <input
-              type="text"
-              placeholder="Name"
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.billTo.name}
-              onChange={(e) => handleBillToChange('name', e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Address"
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.billTo.address}
-              onChange={(e) => handleBillToChange('address', e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="GSTIN"
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.billTo.gstin}
-              onChange={(e) => handleBillToChange('gstin', e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Mobile No."
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.billTo.mobileNo}
-              onChange={(e) => handleBillToChange('mobileNo', e.target.value)}
-            />
-          </div>
-        </div>
+    <div className="bg-gradient-to-b from-slate-50 to-blue-50 min-h-screen">
 
-        {/* Invoice Details Section */}
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold mb-4">Invoice Details</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <input
-              type="text"
-              placeholder="Invoice Number"
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.invoiceDetails.invoiceNumber}
-              onChange={(e) => handleInvoiceDetailsChange('invoiceNumber', e.target.value)}
-            />
-            <input
-              type="date"
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.invoiceDetails.date}
-              onChange={(e) => handleInvoiceDetailsChange('date', e.target.value)}
-            />
-          </div>
-        </div>
+      <Navbar />
+      <ToastContainer />
 
-        {/* Items Section */}
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold mb-4">Items</h3>
-          {invoiceData.items.map((item, index) => (
-            <div key={index} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-4">
-              <input
-                type="text"
-                placeholder="Description"
-                className="p-3 border border-gray-300 rounded-lg w-full"
-                value={item.description}
-                onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="HSN Code"
-                className="p-3 border border-gray-300 rounded-lg w-full"
-                value={item.hsnCode}
-                onChange={(e) => handleItemChange(index, 'hsnCode', e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Quantity"
-                className="p-3 border border-gray-300 rounded-lg w-full"
-                value={item.quantity}
-                onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Price"
-                className="p-3 border border-gray-300 rounded-lg w-full"
-                value={item.rate}
-                onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
-              />
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  placeholder="Amount"
-                  className="p-3 border border-gray-300 rounded-lg w-full"
-                  value={item.amount}
-                  readOnly
-                />
-                <button
-                  type="button"
-                  className="text-red-600 hover:text-red-800"
-                  onClick={() => handleDeleteItem(index)}
-                >
-                  <FaTrashAlt /> {/* React Icon trash icon */}
-                </button>
-              </div>
+      {loading && <Loader />}
+
+      <div className="w-full px-4">
+
+        {/* FULL SCREEN GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4 min-h-screen">
+
+          {/* ================= LEFT FORM ================= */}
+          <div className="bg-white p-6 shadow-xl rounded-lg h-screen overflow-y-auto">
+
+            {/* HEADER */}
+            <div className="flex justify-between mb-6 items-center">
+              <h1 className="text-3xl font-bold tracking-tight">
+                Invoice Generator
+              </h1>
+
+              <button
+                className={btnDark}
+                onClick={() => navigate('/allinvoices')}
+              >
+                View All Invoices
+              </button>
             </div>
-          ))}
-          <button
-            type="button"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-            onClick={handleAddItem}
-          >
-            Add Item
-          </button>
-        </div>
 
-        {/* CGST and SGST Section */}
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold mb-4">CGST/SGST</h3>
-          <div className="grid grid-cols-2 gap-6">
-            <input
-              type="number"
-              placeholder="CGST (%)"
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.cgst}
-              onChange={(e) => handleCGSTSGSTChange('cgst', e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="SGST (%)"
-              className="p-3 border border-gray-300 rounded-lg w-full"
-              value={invoiceData.sgst}
-              onChange={(e) => handleCGSTSGSTChange('sgst', e.target.value)}
-            />
+
+            {/* BILL TO */}
+            <section className="mb-6">
+              <h2 className={sectionTitle}>Bill To</h2>
+
+              <div className="grid md:grid-cols-2 gap-4">
+
+                <div>
+                  <label className={labelStyle}>Customer Name</label>
+                  <input className={inputStyle}
+                    onChange={(e)=>handleBillToChange("name", e.target.value)} />
+                </div>
+
+                <div>
+                  <label className={labelStyle}>Address</label>
+                  <input className={inputStyle}
+                    onChange={(e)=>handleBillToChange("address", e.target.value)} />
+                </div>
+
+                <div>
+                  <label className={labelStyle}>GSTIN</label>
+                  <input className={inputStyle}
+                    onChange={(e)=>handleBillToChange("gstin", e.target.value)} />
+                </div>
+
+                <div>
+                  <label className={labelStyle}>Mobile</label>
+                  <input className={inputStyle}
+                    onChange={(e)=>handleBillToChange("mobileNo", e.target.value)} />
+                </div>
+
+              </div>
+            </section>
+
+
+            {/* INVOICE INFO */}
+            <section className="mb-6">
+              <h2 className={sectionTitle}>Invoice Info</h2>
+
+              <div className="grid md:grid-cols-2 gap-4">
+
+                <div>
+                  <label className={labelStyle}>Invoice No</label>
+                  <input className={inputStyle}
+                    onChange={(e)=>handleInvoiceDetailsChange("invoiceNumber", e.target.value)} />
+                </div>
+
+                <div>
+                  <label className={labelStyle}>Invoice Date</label>
+                  <input className={inputStyle}
+                    type="date"
+                    onChange={(e)=>handleInvoiceDetailsChange("date", e.target.value)} />
+                </div>
+
+              </div>
+            </section>
+
+
+            {/* ITEMS */}
+            <section className="mb-6">
+              <h2 className={sectionTitle}>Items</h2>
+
+              <div className="hidden lg:grid grid-cols-6 gap-3 text-sm 
+                              font-semibold text-gray-600 mb-2 text-center">
+                <p>Description</p>
+                <p>HSN</p>
+                <p>Qty</p>
+                <p>Rate</p>
+                <p>GST %</p>
+                <p>Amount</p>
+              </div>
+
+
+              {invoiceData.items.map((item, i) => (
+
+                <div key={i}
+                  className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 
+                             gap-3 mb-2 items-center justify-items-center">
+
+                  <input className={inputStyle}
+                    placeholder="Item"
+                    onChange={(e)=>handleItemChange(i,"description",e.target.value)} />
+
+                  <input className={inputStyle}
+                    placeholder="HSN"
+                    onChange={(e)=>handleItemChange(i,"hsnCode",e.target.value)} />
+
+                  <input type="number"
+                    className={`${inputStyle} text-center`}
+                    onChange={(e)=>handleItemChange(i,"quantity",e.target.value)} />
+
+                  <input type="number"
+                    className={`${inputStyle} text-center`}
+                    onChange={(e)=>handleItemChange(i,"rate",e.target.value)} />
+
+                  <input type="number"
+                    className={`${inputStyle} text-center`}
+                    onChange={(e)=>handleItemChange(i,"gstPercent",e.target.value)} />
+
+                  <div className="flex gap-2 items-center justify-center">
+                    <input
+                      readOnly
+                      className={`${inputStyle} bg-gray-100 text-center`}
+                      value={item.amount}
+                    />
+
+                    <button
+                      onClick={() => handleDeleteItem(i)}
+                      className="text-red-600 hover:text-red-800 text-lg">
+                      <FaTrashAlt />
+                    </button>
+                  </div>
+
+
+                </div>
+              ))}
+
+
+              <button
+                className={`${btn} mt-3`}
+                type="button"
+                onClick={handleAddItem}
+              >
+                + Add Item
+              </button>
+
+            </section>
+
+
+            {/* TOTAL */}
+            <section className="flex flex-wrap gap-4 items-center">
+              <button onClick={handleCalculateTotal} className={btn}>
+                Calculate Total
+              </button>
+
+              <button onClick={handleRoundOff} className={btn}>
+                Round Off
+              </button>
+
+              <button onClick={storeInvoiceData} className={btn}>
+                Save Invoice
+              </button>
+
+              <div className="ml-auto text-right">
+                <p>Subtotal : ₹{invoiceData.subtotal.toFixed(2)}</p>
+                <p>CGST : ₹{invoiceData.cgstAmount.toFixed(2)}</p>
+                <p>SGST : ₹{invoiceData.sgstAmount.toFixed(2)}</p>
+                <p className="font-bold text-xl">
+                  TOTAL : ₹{invoiceData.total.toFixed(2)}
+                </p>
+              </div>
+
+            </section>
+
           </div>
-        </div>
 
-        {/* Total Calculation and Final Section */}
-        <div className="mb-6 ">
-          <button
-            type="button"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg mr-4"
-            onClick={handleCalculateTotal}
-          >
-            Calculate Total
-          </button>
-          <button
-            type="button"
-            className="px-4 py-2 ml-4 bg-blue-600 text-white rounded-lg"
-            onClick={handleRoundOff}
-          >
-            Round Off
-          </button>
-            <button
-             type="button"
-             className="px-4 ml-10 py-2 bg-blue-600 text-white rounded-lg"
-             onClick={storeInvoiceData}>
-              save data
-            </button>
+
+          {/* ================= RIGHT PREVIEW ================= */}
+
+          <div className="sticky top-0 h-screen overflow-y-auto border-l bg-white">
+            <Preview invoiceData={invoiceData} />
+          </div>
+
         </div>
-        <Preview invoiceData={invoiceData} />
-      </form>
+      </div>
+
     </div>
   );
 };
