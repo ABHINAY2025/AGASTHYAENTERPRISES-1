@@ -249,203 +249,220 @@ const InvoiceForm: React.FC = () => {
   /* ================== JSX ================== */
 
   return (
-    <div className="bg-gradient-to-b from-slate-50 to-blue-50 min-h-screen">
+  <div className="bg-gradient-to-b from-slate-50 to-blue-50 min-h-screen">
 
-      <Navbar />
-      <ToastContainer />
+    <Navbar />
+    <ToastContainer />
 
-      {loading && <Loader />}
+    {loading && <Loader />}
 
-      <div className="w-full px-4">
+    <div className="w-full px-4 max-w-5xl mx-auto">
 
-        {/* FULL SCREEN GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4 min-h-screen">
+      {/* ================= FORM ================= */}
+      <div className="bg-white p-6 shadow-xl rounded-lg">
 
-          {/* ================= LEFT FORM ================= */}
-          <div className="bg-white p-6 shadow-xl rounded-lg h-screen overflow-y-auto">
+        {/* HEADER */}
+        <div className="flex justify-between mb-6 items-center">
+          <h1 className="text-3xl font-bold tracking-tight">
+            Invoice Generator
+          </h1>
 
-            {/* HEADER */}
-            <div className="flex justify-between mb-6 items-center">
-              <h1 className="text-3xl font-bold tracking-tight">
-                Invoice Generator
-              </h1>
+          <button
+            className={btnDark}
+            onClick={() => navigate('/allinvoices')}
+          >
+            View All Invoices
+          </button>
+        </div>
 
-              <button
-                className={btnDark}
-                onClick={() => navigate('/allinvoices')}
-              >
-                View All Invoices
-              </button>
+        {/* BILL TO */}
+        <section className="mb-6">
+          <h2 className={sectionTitle}>Bill To</h2>
+
+          <div className="grid md:grid-cols-2 gap-4">
+
+            <div>
+              <label className={labelStyle}>Customer Name</label>
+              <input
+                className={inputStyle}
+                onChange={(e)=>handleBillToChange("name", e.target.value)}
+              />
             </div>
 
+            <div>
+              <label className={labelStyle}>Address</label>
+              <input
+                className={inputStyle}
+                onChange={(e)=>handleBillToChange("address", e.target.value)}
+              />
+            </div>
 
-            {/* BILL TO */}
-            <section className="mb-6">
-              <h2 className={sectionTitle}>Bill To</h2>
+            <div>
+              <label className={labelStyle}>GSTIN</label>
+              <input
+                className={inputStyle}
+                onChange={(e)=>handleBillToChange("gstin", e.target.value)}
+              />
+            </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelStyle}>Mobile</label>
+              <input
+                className={inputStyle}
+                onChange={(e)=>handleBillToChange("mobileNo", e.target.value)}
+              />
+            </div>
 
-                <div>
-                  <label className={labelStyle}>Customer Name</label>
-                  <input className={inputStyle}
-                    onChange={(e)=>handleBillToChange("name", e.target.value)} />
-                </div>
-
-                <div>
-                  <label className={labelStyle}>Address</label>
-                  <input className={inputStyle}
-                    onChange={(e)=>handleBillToChange("address", e.target.value)} />
-                </div>
-
-                <div>
-                  <label className={labelStyle}>GSTIN</label>
-                  <input className={inputStyle}
-                    onChange={(e)=>handleBillToChange("gstin", e.target.value)} />
-                </div>
-
-                <div>
-                  <label className={labelStyle}>Mobile</label>
-                  <input className={inputStyle}
-                    onChange={(e)=>handleBillToChange("mobileNo", e.target.value)} />
-                </div>
-
-              </div>
-            </section>
+          </div>
+        </section>
 
 
-            {/* INVOICE INFO */}
-            <section className="mb-6">
-              <h2 className={sectionTitle}>Invoice Info</h2>
+        {/* INVOICE INFO */}
+        <section className="mb-6">
+          <h2 className={sectionTitle}>Invoice Info</h2>
 
-              <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
 
-                <div>
-                  <label className={labelStyle}>Invoice No</label>
-                  <input className={inputStyle}
-                    onChange={(e)=>handleInvoiceDetailsChange("invoiceNumber", e.target.value)} />
-                </div>
+            <div>
+              <label className={labelStyle}>Invoice No</label>
+              <input
+                className={inputStyle}
+                onChange={(e)=>handleInvoiceDetailsChange("invoiceNumber", e.target.value)}
+              />
+            </div>
 
-                <div>
-                  <label className={labelStyle}>Invoice Date</label>
-                  <input className={inputStyle}
-                    type="date"
-                    onChange={(e)=>handleInvoiceDetailsChange("date", e.target.value)} />
-                </div>
+            <div>
+              <label className={labelStyle}>Invoice Date</label>
+              <input
+                type="date"
+                className={inputStyle}
+                onChange={(e)=>handleInvoiceDetailsChange("date", e.target.value)}
+              />
+            </div>
 
-              </div>
-            </section>
-
-
-            {/* ITEMS */}
-            <section className="mb-6">
-              <h2 className={sectionTitle}>Items</h2>
-
-              <div className="hidden lg:grid grid-cols-6 gap-3 text-sm 
-                              font-semibold text-gray-600 mb-2 text-center">
-                <p>Description</p>
-                <p>HSN</p>
-                <p>Qty</p>
-                <p>Rate</p>
-                <p>GST %</p>
-                <p>Amount</p>
-              </div>
+          </div>
+        </section>
 
 
-              {invoiceData.items.map((item, i) => (
+        {/* ITEMS */}
+        <section className="mb-6">
+          <h2 className={sectionTitle}>Items</h2>
 
-                <div key={i}
-                  className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 
-                             gap-3 mb-2 items-center justify-items-center">
-
-                  <input className={inputStyle}
-                    placeholder="Item"
-                    onChange={(e)=>handleItemChange(i,"description",e.target.value)} />
-
-                  <input className={inputStyle}
-                    placeholder="HSN"
-                    onChange={(e)=>handleItemChange(i,"hsnCode",e.target.value)} />
-
-                  <input type="number"
-                    className={`${inputStyle} text-center`}
-                    onChange={(e)=>handleItemChange(i,"quantity",e.target.value)} />
-
-                  <input type="number"
-                    className={`${inputStyle} text-center`}
-                    onChange={(e)=>handleItemChange(i,"rate",e.target.value)} />
-
-                  <input type="number"
-                    className={`${inputStyle} text-center`}
-                    onChange={(e)=>handleItemChange(i,"gstPercent",e.target.value)} />
-
-                  <div className="flex gap-2 items-center justify-center">
-                    <input
-                      readOnly
-                      className={`${inputStyle} bg-gray-100 text-center`}
-                      value={item.amount}
-                    />
-
-                    <button
-                      onClick={() => handleDeleteItem(i)}
-                      className="text-red-600 hover:text-red-800 text-lg">
-                      <FaTrashAlt />
-                    </button>
-                  </div>
-
-
-                </div>
-              ))}
-
-
-              <button
-                className={`${btn} mt-3`}
-                type="button"
-                onClick={handleAddItem}
-              >
-                + Add Item
-              </button>
-
-            </section>
-
-
-            {/* TOTAL */}
-            <section className="flex flex-wrap gap-4 items-center">
-              <button onClick={handleCalculateTotal} className={btn}>
-                Calculate Total
-              </button>
-
-              <button onClick={handleRoundOff} className={btn}>
-                Round Off
-              </button>
-
-              <button onClick={storeInvoiceData} className={btn}>
-                Save Invoice
-              </button>
-
-              <div className="ml-auto text-right">
-                <p>Subtotal : ₹{invoiceData.subtotal.toFixed(2)}</p>
-                <p>CGST : ₹{invoiceData.cgstAmount.toFixed(2)}</p>
-                <p>SGST : ₹{invoiceData.sgstAmount.toFixed(2)}</p>
-                <p className="font-bold text-xl">
-                  TOTAL : ₹{invoiceData.total.toFixed(2)}
-                </p>
-              </div>
-
-            </section>
-
+          <div className="hidden md:grid grid-cols-6 gap-3 text-sm 
+                          font-semibold text-gray-600 mb-2 text-center">
+            <p>Description</p>
+            <p>HSN</p>
+            <p>Qty</p>
+            <p>Unit Price</p>
+            <p>GST %</p>
+            <p>Amount</p>
           </div>
 
 
-          {/* ================= RIGHT PREVIEW ================= */}
+          {invoiceData.items.map((item, i) => (
+            <div key={i}
+              className="grid sm:grid-cols-2 md:grid-cols-3 
+                         lg:grid-cols-6 gap-3 mb-2 items-center">
 
-          <div className="sticky top-0 h-screen overflow-y-auto border-l bg-white">
-            <Preview invoiceData={invoiceData} />
+              <input
+                className={inputStyle}
+                placeholder="Item"
+                onChange={(e)=>handleItemChange(i,"description",e.target.value)}
+              />
+
+              <input
+                className={inputStyle}
+                placeholder="HSN"
+                onChange={(e)=>handleItemChange(i,"hsnCode",e.target.value)}
+              />
+
+              <input
+                type="number"
+                className={`${inputStyle} text-center`}
+                onChange={(e)=>handleItemChange(i,"quantity",e.target.value)}
+              />
+
+              <input
+                type="number"
+                className={`${inputStyle} text-center`}
+                onChange={(e)=>handleItemChange(i,"rate",e.target.value)}
+              />
+
+              <input
+                type="number"
+                className={`${inputStyle} text-center`}
+                onChange={(e)=>handleItemChange(i,"gstPercent",e.target.value)}
+              />
+
+              <div className="flex gap-2 items-center justify-center">
+
+                <input
+                  readOnly
+                  className={`${inputStyle} bg-gray-100 text-center`}
+                  value={item.amount}
+                />
+
+                <button
+                  onClick={() => handleDeleteItem(i)}
+                  className="text-red-600 hover:text-red-800 text-lg">
+                  <FaTrashAlt />
+                </button>
+
+              </div>
+
+            </div>
+          ))}
+
+
+          <button
+            className={`${btn} mt-3`}
+            type="button"
+            onClick={handleAddItem}
+          >
+            + Add Item
+          </button>
+        </section>
+
+
+        {/* TOTAL */}
+        <section className="flex flex-wrap gap-4 items-center">
+
+          <button onClick={handleCalculateTotal} className={btn}>
+            Calculate Total
+          </button>
+
+          <button onClick={handleRoundOff} className={btn}>
+            Round Off
+          </button>
+
+          <button onClick={storeInvoiceData} className={btn}>
+            Save Invoice
+          </button>
+
+          <div className="ml-auto text-right">
+            <p>Subtotal : ₹{invoiceData.subtotal.toFixed(2)}</p>
+            <p>CGST : ₹{invoiceData.cgstAmount.toFixed(2)}</p>
+            <p>SGST : ₹{invoiceData.sgstAmount.toFixed(2)}</p>
+
+            <p className="font-bold text-xl">
+              TOTAL : ₹{invoiceData.total.toFixed(2)}
+            </p>
           </div>
 
-        </div>
+        </section>
+
+      </div>
+
+
+      {/* ================= PREVIEW BELOW FORM ================= */}
+      <div className="mt-8 bg-white rounded-lg shadow-lg">
+        <Preview invoiceData={invoiceData} />
       </div>
 
     </div>
-  );
+
+  </div>
+);
 };
 
 export default InvoiceForm;

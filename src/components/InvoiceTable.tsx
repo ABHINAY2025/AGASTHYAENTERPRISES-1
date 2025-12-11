@@ -3,16 +3,20 @@ import { Item } from "../types/invoice";
 
 interface Props {
   items: Item[];
-  startIndex: number;
+  startIndex?: number;
   showHeader?: boolean;
+  innerRef?: React.Ref<HTMLTableSectionElement>; // 🔥 added for dynamic pagination
 }
 
 export const InvoiceTable: React.FC<Props> = ({
   items,
-  startIndex,
+  startIndex = 0,
   showHeader = true,
+  innerRef
 }) => (
   <table className="w-full border-collapse mb-2 text-[13px]">
+    
+    {/* HEADER */}
     {showHeader && (
       <thead>
         <tr className="bg-gray-100">
@@ -20,7 +24,7 @@ export const InvoiceTable: React.FC<Props> = ({
           <th className="border p-1 text-center align-middle">Description</th>
           <th className="border p-1 text-center align-middle">HSN Code</th>
           <th className="border p-1 text-center align-middle">Qty</th>
-          <th className="border p-1 text-center align-middle">Rate</th>
+          <th className="border p-1 text-center align-middle">Unit Price</th>
           <th className="border p-1 text-center align-middle">GST %</th>
           <th className="border p-1 text-center align-middle">GST Amt</th>
           <th className="border p-1 text-center align-middle">Amount</th>
@@ -28,7 +32,8 @@ export const InvoiceTable: React.FC<Props> = ({
       </thead>
     )}
 
-    <tbody>
+    {/* BODY */}
+    <tbody ref={innerRef}> {/* 🔥 rows now measurable */}
       {items.map((item, index) => (
         <tr
           key={startIndex + index}
@@ -60,7 +65,7 @@ export const InvoiceTable: React.FC<Props> = ({
             {item.gstPercent || "0"}%
           </td>
 
-          {/* GST AMT */}
+          {/* GST Amount */}
           <td className="border p-1 text-center align-middle">
             ₹{item.gstAmount?.toFixed(2) || "0.00"}
           </td>

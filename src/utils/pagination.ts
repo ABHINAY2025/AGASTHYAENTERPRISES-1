@@ -1,9 +1,9 @@
-export const ITEMS_PER_PAGE_1 = 15;
+export const ITEMS_PER_PAGE_1 = 9;
 export const ITEMS_PER_PAGE_2 = 24;
 export const ITEMS_PER_PAGE_3 = 24; // Define items per page for the third page
-export const FOOTER_THRESHOLD_1 = 11;
-export const FOOTER_THRESHOLD_2 = 30; // Footer for page 2
-export const FOOTER_THRESHOLD_3 = 61; // Define threshold for the third page
+export const FOOTER_THRESHOLD_1 = 9;
+export const FOOTER_THRESHOLD_2 = 24; // Footer for page 2
+export const FOOTER_THRESHOLD_3 = 38; // Define threshold for the third page
 
 export const calculateTotalPages = (totalItems: number): number => {
   if (totalItems > FOOTER_THRESHOLD_3) {

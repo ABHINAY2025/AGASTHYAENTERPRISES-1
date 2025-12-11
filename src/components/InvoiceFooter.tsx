@@ -49,7 +49,7 @@ export const InvoiceFooter: React.FC<Props> = ({ data }) => {
         <div>
           <div className="mb-2 w-96">
             <h1 className="font-bold">Amount In Words:</h1>
-            <h1 className="underline font-bold">
+            <h1 className="underline underline-offset-2 text-red-600 font-bold">
               {toWords.convert(data.total).toUpperCase()}
             </h1>
           </div>
@@ -90,14 +90,14 @@ export const InvoiceFooter: React.FC<Props> = ({ data }) => {
               <h1>Subtotal:</h1>
               <h1>CGST:</h1>
               <h1>SGST:</h1>
-              <h1 className="mt-4 font-bold">Total:</h1>
+              <h1 className="mt-4 font-bold text-red-600">TOTAL:</h1>
             </div>
 
             <div className="text-right font-bold">
               <h1>₹{data.subtotal.toFixed(2)}</h1>
               <h1>₹{data.cgstAmount.toFixed(2)}</h1>
               <h1>₹{data.sgstAmount.toFixed(2)}</h1>
-              <h1 className="mt-4">
+              <h1 className="mt-4 text-red-600">
                 ₹{data.total.toFixed(2)}
               </h1>
             </div>
